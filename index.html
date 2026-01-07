@@ -169,9 +169,9 @@
   <div id="alert"></div>
 
   <script>
-    // 🚨 CONFIGURATION — REPLACE THESE VALUES 🚨
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6E1K_WKQS9TzmiOynQ4GsqUNxDBlFlZfPh4bDZ_HCPmXdr9QXInl02omMaFznO4aDig/exec"; // ← Replace this! 
-    const PAGE_BASE_URL = "https://maharjanil.github.io/textreader/"; // ← e.g., "https://yourname.github.io/text-reader-cloud.html"
+    // ✅ Fixed configuration — no trailing spaces
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6E1K_WKQS9TzmiOynQ4GsqUNxDBlFlZfPh4bDZ_HCPmXdr9QXInl02omMaFznO4aDig/exec";
+    const PAGE_BASE_URL = "https://maharjanil.github.io/textreader/";
 
     // DOM Elements
     const textarea = document.getElementById('text-area');
@@ -181,7 +181,7 @@
     const alertBox = document.getElementById('alert');
     let shareMenuElem = null;
 
-    // === On Load: Check if URL has a cloud ID (e.g., #abc123) ===
+    // === Load text from cloud if URL has an ID (e.g., #abc123) ===
     window.addEventListener('load', async () => {
       const id = window.location.hash.substring(1);
       if (id && /^[a-zA-Z0-9]{6,10}$/.test(id)) {
@@ -200,7 +200,7 @@
       }
     });
 
-    // === Cloud Save ===
+    // === Save to Google Sheet via Apps Script ===
     async function saveToCloud() {
       const text = textarea.value.trim();
       if (!text) return showAlert("Enter text to save.");
@@ -332,7 +332,7 @@
       setTimeout(() => alertBox.style.display = 'none', 3000);
     }
 
-    // Close popups with Escape
+    // Close popups with Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (readingPopup.style.display === 'flex') closeReadingView();
