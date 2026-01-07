@@ -169,11 +169,10 @@
   <div id="alert"></div>
 
   <script>
-    // ✅ Fixed configuration — no trailing spaces
+    // ✅ Correct URLs — no trailing spaces
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6E1K_WKQS9TzmiOynQ4GsqUNxDBlFlZfPh4bDZ_HCPmXdr9QXInl02omMaFznO4aDig/exec";
     const PAGE_BASE_URL = "https://maharjanil.github.io/textreader/";
 
-    // DOM Elements
     const textarea = document.getElementById('text-area');
     const readingPopup = document.getElementById('reading-popup');
     const readingText = document.getElementById('reading-text');
@@ -181,7 +180,7 @@
     const alertBox = document.getElementById('alert');
     let shareMenuElem = null;
 
-    // === Load text from cloud if URL has an ID (e.g., #abc123) ===
+    // Load text if URL has an ID
     window.addEventListener('load', async () => {
       const id = window.location.hash.substring(1);
       if (id && /^[a-zA-Z0-9]{6,10}$/.test(id)) {
@@ -200,7 +199,7 @@
       }
     });
 
-    // === Save to Google Sheet via Apps Script ===
+    // ✅ FIXED: Proper form-encoded POST for Google Apps Script
     async function saveToCloud() {
       const text = textarea.value.trim();
       if (!text) return showAlert("Enter text to save.");
@@ -208,22 +207,25 @@
       try {
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
           body: "text=" + encodeURIComponent(text),
         });
-        const fullUrl = await response.text();
 
-        if (fullUrl.startsWith("http")) {
-          await navigator.clipboard.writeText(fullUrl);
+        const result = await response.text();
+        if (result.startsWith("http")) {
+          await navigator.clipboard.writeText(result);
           showAlert("✅ Cloud link copied! Share it to view anytime.");
         } else {
-          showAlert("⚠️ Save failed: " + fullUrl);
+          showAlert("⚠️ Save failed: " + result);
         }
       } catch (err) {
         showAlert("❌ Network error: " + err.message);
       }
     }
 
-    // === Copy ===
+    // Copy
     async function copyText() {
       const text = textarea.value.trim();
       if (!text) return showAlert("Nothing to copy!");
@@ -248,7 +250,7 @@
       showAlert("Copied (fallback).");
     }
 
-    // === Print ===
+    // Print
     function printText() {
       printOutput.textContent = textarea.value;
       printOutput.style.display = 'block';
@@ -257,7 +259,7 @@
     }
     function printFromPopup() { printText(); }
 
-    // === Reading View ===
+    // Reading View
     function openReadingView() {
       const text = textarea.value.trim();
       if (!text) return showAlert("Enter text first.");
@@ -272,7 +274,7 @@
       readingPopup.style.display = 'flex';
     }
 
-    // === Share Menu ===
+    // Share Menu
     function openShareMenu() {
       const text = textarea.value.trim();
       if (!text) return showAlert("Enter text to share.");
@@ -325,14 +327,14 @@
       if (shareMenuElem) shareMenuElem.style.display = 'none';
     }
 
-    // === Utility ===
+    // Utility
     function showAlert(msg) {
       alertBox.textContent = msg;
       alertBox.style.display = 'block';
       setTimeout(() => alertBox.style.display = 'none', 3000);
     }
 
-    // Close popups with Escape key
+    // Close popups with Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (readingPopup.style.display === 'flex') closeReadingView();
